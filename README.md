@@ -84,7 +84,7 @@ Store clean data in a database
 
 Practice Docker-based data engineering setups
 
-#🧑‍💻 Author
+# 🧑‍💻 Author
 ## Vishnu Yogesh
 ### I built this project to explore data pipelines, automation, and astronomy APIs.
 ### Feel free to ⭐ star the repo or connect with me for feedback or collaboration!
