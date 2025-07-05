@@ -1,45 +1,106 @@
-Overview
-========
+🚀 Airflow ETL Pipeline with NASA API & PostgreSQL
+This project shows how to build an ETL pipeline using Apache Airflow, PostgreSQL, and data from NASA's Astronomy Picture of the Day (APOD) API — all running in Docker containers.
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+The pipeline automatically fetches data daily from the NASA API, processes it, and stores it in a PostgreSQL database for future use (e.g., analysis, dashboards, or fun space facts! 🪐).
 
-Project Contents
-================
+📌 What This Project Does
+Extract data from the NASA APOD API (title, image URL, explanation, and date).
 
-Your Astro project contains the following files and folders:
+Transform the data into a clean format.
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+Load it into a PostgreSQL database.
 
-Deploy Your Project Locally
-===========================
+All of this is automated using Apache Airflow and scheduled to run daily.
 
-Start Airflow on your local machine by running 'astro dev start'.
+🧱 Key Tools Used
+Tool	Purpose
+Airflow	Orchestrates the ETL process with a daily schedule
+PostgreSQL	Stores the final, processed data
+NASA APOD API	Provides interesting astronomy data
+Docker	Runs Airflow & Postgres in isolated containers
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+⚙️ How the Pipeline Works
+mermaid
+Copy
+Edit
+flowchart TD
+    A[Start DAG Daily] --> B[Extract from NASA API]
+    B --> C[Transform JSON Data]
+    C --> D[Create Table if Needed]
+    D --> E[Load into PostgreSQL]
+1. Extract
+Airflow uses the SimpleHttpOperator to call NASA's APOD API.
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+2. Transform
+Using Airflow’s @task decorator (TaskFlow API), it filters and prepares the data.
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+3. Load
+The PostgresHook inserts the data into a PostgreSQL table. If the table doesn’t exist, it is created automatically.
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+🐳 Dockerized Setup
+Everything runs in Docker containers, making setup super easy and reproducible.
 
-Deploy Your Project to Astronomer
-=================================
+Services:
+airflow-webserver
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
+airflow-scheduler
 
-Contact
-=======
+airflow-worker
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+postgres
+
+pgadmin (optional for viewing the database)
+
+✅ How to Run This Project
+Clone the Repo
+
+bash
+Copy
+Edit
+git clone https://github.com/yourusername/airflow-nasa-etl.git
+cd airflow-nasa-etl
+Add Your NASA API Key
+
+Create a .env file and add:
+
+ini
+Copy
+Edit
+NASA_API_KEY=your_actual_api_key_here
+Start the Project with Docker
+
+bash
+Copy
+Edit
+docker-compose up --build
+Open Airflow
+
+Visit: http://localhost:8080
+Login: admin / admin
+
+Trigger the DAG
+
+Find the DAG named nasa_apod_etl and trigger it manually or let it run daily.
+
+🗃️ Output Example
+The final Postgres table will have entries like:
+
+date	title	explanation	url
+2025-07-05	Black Hole and Friends	A fun explanation...	https://apod.nasa.gov/...
+
+📚 Learning Goals
+Learn how to build an ETL workflow
+
+Use Airflow's DAGs, hooks, and operators
+
+Work with real-world APIs
+
+Store clean data in a database
+
+Practice Docker-based data engineering setups
+
+🧑‍💻 Author
+Vishnu Yogesh
+I built this project to explore data pipelines, automation, and astronomy APIs.
+Feel free to ⭐ star the repo or connect with me for feedback or collaboration!
+
